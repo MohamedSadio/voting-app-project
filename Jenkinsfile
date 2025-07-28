@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        COMPOSE_PROJECT_NAME = 'voting-app'
+        COMPOSE_PROJECT_NAME = 'voting-app-project'
         PROJECT_PATH = '/home/projeager/voting-app-project'
     }
     
@@ -12,11 +12,10 @@ pipeline {
                 echo 'Preparing workspace from local files...'
                 script {
                     // Copier les fichiers du projet local vers l'espace de travail Jenkins
-                    sh '''
-                        rm -rf ./*
-                        cp -r ${PROJECT_PATH}/* .
-                        ls -la
-                    '''
+                    dir("${PROJECT_PATH}") {
+                        sh 'pwd'
+                        sh 'ls -la'
+                    }
                 }
             }
         }

@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+    
+    environment {
+        COMPOSE_PROJECT_NAME = 'voting-app'
+    }
+    
+    stages {
+        stage('Clone Repository') {
+            steps {
+                echo 'Cloning repository...'
+                git branch: 'main', url: 'https://github.com/ton-username/voting-app-project.git'
+            }
+        }
+        
+        stage('Build Images') {
+            steps {
+                echo 'Building Docker images...'
+                sh 'docker-compose build --no-cache'
+            }
+        }
+        
+        stage('Deploy Application') {
+            steps {
+                echo 'Deploying application...'
+                sh 'docker-compose down || true'
+                sh 'docker-compose up -d vote result worker redis db'
+            }
+        }
+        
+        stage('Health Check') {
+            steps {
+                echo 'Checking application health...'
+                script {
+                    sleep 30
+                    
+                    sh 'curl -f http://localhost:5000 || exit 1'
+                    
+                    sh 'curl -f http://localhost:5001 || exit 1'
+                    
+                    echo 'Application is healthy!'
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+            sh 'docker-compose logs'
+        }
+        always {
+            echo 'Cleaning up...'
+            sh 'docker system prune -f'
+        }
+    }
+}

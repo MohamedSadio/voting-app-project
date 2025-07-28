@@ -3,13 +3,21 @@ pipeline {
     
     environment {
         COMPOSE_PROJECT_NAME = 'voting-app'
+        PROJECT_PATH = '/home/projeager/voting-app-project'
     }
     
     stages {
-        stage('Clone Repository') {
+        stage('Prepare Workspace') {
             steps {
-                echo 'Cloning repository...'
-                git branch: 'main', url: 'https://github.com/ton-username/voting-app-project.git'
+                echo 'Preparing workspace from local files...'
+                script {
+                    // Copier les fichiers du projet local vers l'espace de travail Jenkins
+                    sh '''
+                        rm -rf ./*
+                        cp -r ${PROJECT_PATH}/* .
+                        ls -la
+                    '''
+                }
             }
         }
         
@@ -32,10 +40,13 @@ pipeline {
             steps {
                 echo 'Checking application health...'
                 script {
+                    // Attendre que les services soient prêts
                     sleep 30
                     
+                    // Vérifier vote app
                     sh 'curl -f http://localhost:5000 || exit 1'
                     
+                    // Vérifier result app
                     sh 'curl -f http://localhost:5001 || exit 1'
                     
                     echo 'Application is healthy!'

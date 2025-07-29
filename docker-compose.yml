@@ -1,7 +1,9 @@
+version: '3.8'
+
 services:
   # Cache Redis
   redis:
-    image: redis:7-alpine
+    image: redis:7.2-alpine
     container_name: voting-redis
     networks:
       - backend-network
@@ -20,14 +22,12 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      # Créer automatiquement l'utilisateur et la base
-      POSTGRES_INITDB_ARGS: "--auth-host=md5"
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
       - backend-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME} -h localhost"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -93,24 +93,14 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     restart: unless-stopped
 
-# Définition des réseaux
 networks:
   frontend-network:
     driver: bridge
     name: voting-frontend
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-          gateway: 172.20.0.1
   backend-network:
     driver: bridge
     name: voting-backend
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
-          gateway: 172.21.0.1
 
-# Définition des volumes
 volumes:
   db-data:
     driver: local

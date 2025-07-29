@@ -16,43 +16,42 @@ services:
 
   # Base de données PostgreSQL
   db:
-    image: postgres:15-alpine
-    container_name: voting-db
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - backend-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 80s
+  image: postgres:15-alpine
+  container_name: voting-db
+  environment:
+    POSTGRES_DB: voting_db
+    POSTGRES_USER: voting_user
+    POSTGRES_PASSWORD: SecurePassword123!
+  volumes:
+    - db-data:/var/lib/postgresql/data
+  networks:
+    - backend-network
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U voting_user -d voting_db"]
+    interval: 30s
+    timeout: 10s
+    retries: 5
+    start_period: 60s
 
-  # Service Worker (.NET)
-  worker:
-    build: 
-      context: ./worker
-      dockerfile: Dockerfile
-    container_name: voting-worker
-    depends_on:
-      redis:
-        condition: service_healthy
-      db:
-        condition: service_healthy
-    networks:
-      - backend-network
-    environment:
-      REDIS_HOST: redis
-      DB_HOST: db
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-    restart: unless-stopped
+worker:
+  build:
+    context: ./worker
+    dockerfile: Dockerfile
+  container_name: voting-worker
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  networks:
+    - backend-network
+  environment:
+    REDIS_HOST: redis
+    DB_HOST: db
+    DB_NAME: voting_db
+    DB_USER: voting_user
+    DB_PASSWORD: SecurePassword123!
+  restart: unless-stopped
 
   # Application de Vote (Python)
   vote:
@@ -74,24 +73,24 @@ services:
 
   # Application de Résultats (Node.js)
   result:
-    build:
-      context: ./result
-      dockerfile: Dockerfile
-    container_name: voting-result
-    ports:
-      - "${RESULT_PORT}:80"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - frontend-network
-      - backend-network
-    environment:
-      DB_HOST: db
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-    restart: unless-stopped
+  build:
+    context: ./result
+    dockerfile: Dockerfile
+  container_name: voting-result
+  ports:
+    - "5001:80"
+  depends_on:
+    db:
+      condition: service_healthy
+  networks:
+    - frontend-network
+    - backend-network
+  environment:
+    DB_HOST: db
+    DB_NAME: voting_db
+    DB_USER: voting_user
+    DB_PASSWORD: SecurePassword123!
+  restart: unless-stopped
 
 # Définition des réseaux
 networks:

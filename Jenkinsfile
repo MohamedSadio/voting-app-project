@@ -20,7 +20,7 @@ pipeline {
 
     stage('Cloner le dépôt') {
       steps {
-        git branch: 'main', url: 'https://github.com/MohamedSadio/voting-app.git'
+        git branch: 'main', url: 'https://github.com/MohamedSadio/voting-app-project.git'
       }
     }
 

@@ -1,5 +1,18 @@
 services:
-  # Base de données PostgreSQL
+  # Cache Redis
+  redis:
+    image: redis:7-alpine
+    container_name: voting-redis
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+      # Base de données PostgreSQL
   db:
     image: postgres:15-alpine
     container_name: voting-db
@@ -17,19 +30,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-
-  # Cache Redis
-  redis:
-    image: redis:7-alpine
-    container_name: voting-redis
-    networks:
-      - backend-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
   # Service Worker (.NET)
   worker:

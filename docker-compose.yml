@@ -1,111 +1,116 @@
+version: '3.8'
+
+networks:
+  front-tier:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+  back-tier:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+
 services:
-  # Cache Redis
   redis:
-    image: redis:7-alpine
-    container_name: voting-redis
+    image: redis:alpine
+    container_name: redis
     networks:
-      - backend-network
+      - back-tier
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
 
-  # Base de données PostgreSQL
   db:
-    image: postgres:15-alpine
-    container_name: voting-db
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - db-data:/var/lib/postgresql/data
+    image: postgres:13
+    container_name: postgres
     networks:
-      - backend-network
+      - back-tier  # Database on back-tier network
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
-  # Service Worker (.NET)
-  worker:
-    build:
-      context: ./worker
-      dockerfile: Dockerfile
-    container_name: voting-worker
+  vote:
+    build: ./vote
+    container_name: vote_app
+    networks:
+      - front-tier  # Exposed to users
+      - back-tier   # Can access Redis and DB
     depends_on:
       redis:
         condition: service_healthy
       db:
         condition: service_healthy
-    networks:
-      - backend-network
-    environment:
-      REDIS_HOST: redis
-      DB_HOST: db
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-    restart: unless-stopped
-
-  # Application de Vote (Python)
-  vote:
-    build:
-      context: ./vote
-      dockerfile: Dockerfile
-    container_name: voting-app
     ports:
       - "${VOTE_PORT}:80"
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - frontend-network
-      - backend-network
     environment:
-      REDIS_HOST: redis
-      DB_HOST: db
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      DB_HOST: ${DB_HOST}
     restart: unless-stopped
 
-  # Application de Résultats (Node.js)
   result:
-    build:
-      context: ./result
-      dockerfile: Dockerfile
-    container_name: voting-result
-    ports:
-      - "${RESULT_PORT}:80"
+    build: ./result
+    container_name: result_app
+    networks:
+      - front-tier  # Exposed to users
+      - back-tier   # Can access DB
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - frontend-network
-      - backend-network
+    ports:
+      - "${RESULT_PORT}:80"
     environment:
-      DB_HOST: db
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
     restart: unless-stopped
 
-# Définition des réseaux
-networks:
-  frontend-network:
-    driver: bridge
-    name: voting-frontend
-  backend-network:
-    driver: bridge
-    name: voting-backend
+  worker:
+    build: ./worker
+    container_name: worker_app
+    networks:
+      - back-tier   # Can access Redis and DB (no front-tier needed)
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      DB_HOST: ${DB_HOST}
+    restart: unless-stopped
 
-# Définition des volumes
+  jenkins:
+    build: .
+    container_name: jenkins
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    networks:
+      - front-tier  # Only needs front-tier access
+      - back-tier   # Added back-tier for Docker socket access if needed
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+    restart: unless-stopped
+
 volumes:
-  db-data:
-    driver: local
-    name: voting-db-data
+  postgres_data:
+  jenkins_home:
+    external: true 
+    name: jenkins_home

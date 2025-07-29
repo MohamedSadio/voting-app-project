@@ -16,7 +16,7 @@ services:
 
   # Base de données PostgreSQL
   db:
-    image: postgres:13-alpine
+    image: postgres:15-alpine
     container_name: voting-db
     environment:
       POSTGRES_DB: ${DB_NAME}

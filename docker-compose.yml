@@ -21,8 +21,7 @@ volumes:
     driver: local
     ipam:
       config:
-        - subnet: 172.21.0.0/16
-          gateway: 172.21.0.1
+        - subnet: 172.22.0.0/24
     name: voting-db-data
     
 

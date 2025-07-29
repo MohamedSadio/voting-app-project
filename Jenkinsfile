@@ -1,70 +1,43 @@
 pipeline {
     agent any
-    
+
     environment {
-        COMPOSE_PROJECT_NAME = 'voting-app-project'
-        PROJECT_PATH = '/home/projeager/voting-app-project'
+        COMPOSE_FILE = 'docker-compose.yml'
     }
-    
+
     stages {
-        stage('Prepare Workspace') {
+        stage('Clone') {
             steps {
-                echo 'Preparing workspace from local files...'
-                script {
-                    // Copier les fichiers du projet local vers l'espace de travail Jenkins
-                    dir("${PROJECT_PATH}") {
-                        sh 'pwd'
-                        sh 'ls -la'
-                    }
-                }
+		git url: 'https://github.com/SidyGueye/voting-app.git', branch: 'main'
             }
         }
-        
-        stage('Build Images') {
+
+        stage('Build') {
             steps {
-                echo 'Building Docker images...'
-                sh 'docker-compose build --no-cache'
+                sh 'docker-compose build'
             }
         }
-        
-        stage('Deploy Application') {
+
+        stage('Deploy') {
             steps {
-                echo 'Deploying application...'
-                sh 'docker-compose down || true'
-                sh 'docker-compose up -d vote result worker redis db'
+                sh 'docker-compose up -d'
             }
         }
-        
-        stage('Health Check') {
+
+        stage('Vérification') {
             steps {
-                echo 'Checking application health...'
-                script {
-                    // Attendre que les services soient prêts
-                    sleep 30
-                    
-                    // Vérifier vote app
-                    sh 'curl -f http://localhost:5000 || exit 1'
-                    
-                    // Vérifier result app
-                    sh 'curl -f http://localhost:5001 || exit 1'
-                    
-                    echo 'Application is healthy!'
-                }
+                echo '--- Conteneurs en cours ---'
+                sh 'docker ps'
             }
         }
     }
-    
+
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo ' Déploiement réussi !'
         }
         failure {
-            echo 'Pipeline failed!'
-            sh 'docker-compose logs'
-        }
-        always {
-            echo 'Cleaning up...'
-            sh 'docker system prune -f'
+            echo ' Le déploiement a échoué.'
         }
     }
 }

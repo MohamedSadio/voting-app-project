@@ -1,4 +1,5 @@
 services:
+
   # Cache Redis
   redis:
     image: redis:7-alpine
@@ -11,6 +12,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+
 
   # Base de données PostgreSQL
   db:
@@ -25,7 +27,7 @@ services:
     networks:
       - backend-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -33,7 +35,7 @@ services:
 
   # Service Worker (.NET)
   worker:
-    build:
+    build: 
       context: ./worker
       dockerfile: Dockerfile
     container_name: voting-worker
@@ -68,10 +70,6 @@ services:
       - backend-network
     environment:
       REDIS_HOST: redis
-      DB_HOST: db
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
     restart: unless-stopped
 
   # Application de Résultats (Node.js)

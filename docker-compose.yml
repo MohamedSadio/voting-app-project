@@ -1,5 +1,3 @@
-services:
-
 # Définition des réseaux
 networks:
   frontend-network:
@@ -16,6 +14,9 @@ networks:
       config:
         - subnet: 172.21.0.0/16
           gateway: 172.21.0.1
+
+
+services:
 
 # Définition des volumes
 volumes:

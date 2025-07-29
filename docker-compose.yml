@@ -1,33 +1,4 @@
-# Définition des réseaux
-networks:
-  frontend-network:
-    driver: bridge
-    name: voting-frontend
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-          gateway: 172.20.0.1
-  backend-network:
-    driver: bridge
-    name: voting-backend
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
-          gateway: 172.21.0.1
-
-
 services:
-
-# Définition des volumes
-volumes:
-  db-data:
-    driver: local
-    internal: true
-    ipam:
-      config:
-        - subnet: 172.22.0.0/24
-    name: voting-db-data
-
   # Cache Redis
   redis:
     image: redis:7-alpine
@@ -40,7 +11,6 @@ volumes:
       timeout: 10s
       retries: 3
       start_period: 30s
-
 
   # Base de données PostgreSQL
   db:
@@ -121,4 +91,25 @@ volumes:
       DB_PASSWORD: ${DB_PASSWORD}
     restart: unless-stopped
 
+# Définition des réseaux
+networks:
+  frontend-network:
+    driver: bridge
+    name: voting-frontend
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+  backend-network:
+    driver: bridge
+    name: voting-backend
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1
 
+# Définition des volumes
+volumes:
+  db-data:
+    driver: local
+    name: voting-db-data

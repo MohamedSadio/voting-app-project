@@ -92,23 +92,7 @@ services:
       DB_HOST: ${DB_HOST}
     restart: unless-stopped
 
-  jenkins:
-    build: .
-    container_name: jenkins
-    user: root
-    ports:
-      - "8080:8080"
-      - "50000:50000"
-    networks:
-      - front-tier  # Only needs front-tier access
-      - back-tier   # Added back-tier for Docker socket access if needed
-    volumes:
-      - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
-    restart: unless-stopped
-
+  
 volumes:
   postgres_data:
   jenkins_home:

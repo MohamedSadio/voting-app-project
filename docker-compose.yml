@@ -1,4 +1,5 @@
 services:
+
   # Cache Redis
   redis:
     image: redis:7-alpine
@@ -12,7 +13,8 @@ services:
       retries: 3
       start_period: 30s
 
-      # Base de données PostgreSQL
+
+  # Base de données PostgreSQL
   db:
     image: postgres:15-alpine
     container_name: voting-db

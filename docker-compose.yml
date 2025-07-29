@@ -48,7 +48,7 @@ services:
       - backend-network
     environment:
       REDIS_HOST: redis
-      DB_HOST: db
+      DB_HOST: ${DB_HOST}
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
@@ -70,6 +70,10 @@ services:
       - backend-network
     environment:
       REDIS_HOST: redis
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     restart: unless-stopped
 
   # Application de Résultats (Node.js)
@@ -87,7 +91,7 @@ services:
       - frontend-network
       - backend-network
     environment:
-      DB_HOST: db
+      DB_HOST: ${DB_HOST}
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}

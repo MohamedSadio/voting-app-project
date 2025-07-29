@@ -1,9 +1,8 @@
-version: '3.8'
-
 services:
+
   # Cache Redis
   redis:
-    image: redis:7.2-alpine
+    image: redis:7-alpine
     container_name: voting-redis
     networks:
       - backend-network
@@ -14,7 +13,8 @@ services:
       retries: 3
       start_period: 30s
 
-   # Base de données PostgreSQL
+
+  # Base de données PostgreSQL
   db:
     image: postgres:13-alpine
     container_name: voting-db
@@ -93,6 +93,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     restart: unless-stopped
 
+# Définition des réseaux
 networks:
   frontend-network:
     driver: bridge
@@ -101,6 +102,7 @@ networks:
     driver: bridge
     name: voting-backend
 
+# Définition des volumes
 volumes:
   db-data:
     driver: local

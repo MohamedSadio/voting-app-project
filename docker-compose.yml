@@ -20,6 +20,10 @@ volumes:
   db-data:
     driver: local
     name: voting-db-data
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
 
 services:
   # Cache Redis

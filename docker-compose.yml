@@ -14,22 +14,23 @@ services:
 
   # Base de données PostgreSQL
   db:
-    image: postgres:15-alpine
+    image: postgres:14-alpine
     container_name: voting-db
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      # Créer automatiquement l'utilisateur et la base
       POSTGRES_INITDB_ARGS: "--auth-host=md5"
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
       - backend-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME} -h localhost"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
       start_period: 60s
 
   # Service Worker (.NET)

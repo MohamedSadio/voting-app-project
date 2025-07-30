@@ -11,8 +11,8 @@ pipeline {
     stage('Check Tools') {
       steps {
         sh '''
-          docker --version || { echo "❌ Docker introuvable"; exit 1; }
-          docker compose version || { echo "❌ Docker Compose introuvable"; exit 1; }
+          docker --version || { echo " Docker introuvable"; exit 1; }
+          docker compose version || { echo " Docker Compose introuvable"; exit 1; }
         '''
       }
     }
@@ -55,22 +55,22 @@ pipeline {
           # Vérifier les conteneurs actifs
           RUNNING_CONTAINERS=$(docker compose ps --services --filter "status=running" | wc -l)
           if [ "$RUNNING_CONTAINERS" -lt 3 ]; then
-            echo "❌ Pas assez de conteneurs actifs"
+            echo " Pas assez de conteneurs actifs"
             exit 1
           fi
           
           # Test Vote App
           if curl -f -s -m 10 http://localhost:${VOTE_PORT} > /dev/null; then
-            echo "✅ Vote App - OK"
+            echo " Vote App - OK"
           else
-            echo "❌ Vote App - KO"
+            echo " Vote App - KO"
           fi
           
           # Test Result App  
           if curl -f -s -m 10 http://localhost:${RESULT_PORT} > /dev/null; then
-            echo "✅ Result App - OK"
+            echo " Result App - OK"
           else
-            echo "❌ Result App - KO"
+            echo " Result App - KO"
           fi
         '''
       }
@@ -79,13 +79,13 @@ pipeline {
   
   post {
     success {
-      echo "✅ Pipeline réussi! Services accessibles sur:"
+      echo " Pipeline réussi! Services accessibles sur:"
       echo "   - Vote: http://localhost:${VOTE_PORT}"
       echo "   - Results: http://localhost:${RESULT_PORT}"
     }
     failure {
       sh '''
-        echo "❌ Pipeline échoué:"
+        echo " Pipeline échoué:"
         docker compose ps
         docker compose logs --tail=20
       '''

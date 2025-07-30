@@ -1,0 +1,437 @@
+Started by user Mohamed Sadio
+Obtained Jenkinsfile from git https://github.com/MohamedSadio/voting-app-project.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/jenkins_home/workspace/jobVotingApp
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/jobVotingApp/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/MohamedSadio/voting-app-project.git # timeout=10
+Fetching upstream changes from https://github.com/MohamedSadio/voting-app-project.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.39.5'
+ > git fetch --tags --force --progress -- https://github.com/MohamedSadio/voting-app-project.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 882e5409b6289d08f491ab6b0dc91945fe57d53d (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 882e5409b6289d08f491ab6b0dc91945fe57d53d # timeout=10
+Commit message: "m"
+ > git rev-list --no-walk ab2d6e73e7431d53f0bc9222fdfe42a27247228e # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Check Tools)
+[Pipeline] sh
++ echo === Vérification Docker & Docker Compose ===
+=== Vérification Docker & Docker Compose ===
++ docker --version
+Docker version 28.3.3, build 980b856
++ docker compose version
+Docker Compose version v2.39.1
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Cloner le dépôt)
+[Pipeline] git
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/jobVotingApp/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/MohamedSadio/voting-app-project.git # timeout=10
+Fetching upstream changes from https://github.com/MohamedSadio/voting-app-project.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.39.5'
+ > git fetch --tags --force --progress -- https://github.com/MohamedSadio/voting-app-project.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 882e5409b6289d08f491ab6b0dc91945fe57d53d (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 882e5409b6289d08f491ab6b0dc91945fe57d53d # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D main # timeout=10
+ > git checkout -b main 882e5409b6289d08f491ab6b0dc91945fe57d53d # timeout=10
+Commit message: "m"
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build des images Docker)
+[Pipeline] sh
++ docker compose build --pull
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.54kB done
+#1 DONE 0.0s
+
+#2 [vote internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.09kB 0.0s done
+#2 DONE 0.1s
+
+#3 [result internal] load build definition from Dockerfile
+#3 transferring dockerfile: 525B 0.0s done
+#3 ...
+
+#4 [worker internal] load build definition from Dockerfile
+#4 transferring dockerfile: 1.04kB 0.0s done
+#4 DONE 0.1s
+
+#3 [result internal] load build definition from Dockerfile
+#3 DONE 0.2s
+
+#5 [worker internal] load metadata for mcr.microsoft.com/dotnet/sdk:7.0
+#5 DONE 0.7s
+
+#6 [worker internal] load metadata for mcr.microsoft.com/dotnet/runtime:7.0
+#6 DONE 0.7s
+
+#7 [worker internal] load .dockerignore
+#7 transferring context: 2B done
+#7 DONE 0.0s
+
+#8 [worker build 1/7] FROM mcr.microsoft.com/dotnet/sdk:7.0@sha256:d32bd65cf5843f413e81f5d917057c82da99737cb1637e905a1a4bc2e7ec6c8d
+#8 DONE 0.0s
+
+#9 [worker stage-1 1/3] FROM mcr.microsoft.com/dotnet/runtime:7.0@sha256:8cd26108e7a329458e5b84342816ae39b2b38bd041cfdc0b79b8cf1c0e0d376f
+#9 DONE 0.0s
+
+#10 [worker internal] load build context
+#10 transferring context: 95B done
+#10 DONE 0.0s
+
+#11 [vote internal] load metadata for docker.io/library/python:3.11-slim
+#11 ...
+
+#12 [worker build 5/7] RUN dotnet restore -a amd64
+#12 CACHED
+
+#13 [worker build 6/7] COPY . .
+#13 CACHED
+
+#14 [worker build 2/7] RUN echo "I am running on linux/amd64, building for linux/amd64"
+#14 CACHED
+
+#15 [worker stage-1 2/3] WORKDIR /app
+#15 CACHED
+
+#16 [worker build 3/7] WORKDIR /source
+#16 CACHED
+
+#17 [worker build 4/7] COPY *.csproj .
+#17 CACHED
+
+#18 [worker build 7/7] RUN dotnet publish -c release -o /app -a amd64 --self-contained false --no-restore
+#18 CACHED
+
+#19 [worker stage-1 3/3] COPY --from=build /app .
+#19 CACHED
+
+#20 [worker] exporting to image
+#20 exporting layers done
+#20 writing image sha256:1fcc8083811ce68137d8f8b72d436e14e05d8979f5811d62256d670b8bd19803 done
+#20 naming to docker.io/library/jobvotingapp-worker done
+#20 DONE 0.0s
+
+#21 [worker] resolving provenance for metadata file
+#21 DONE 0.0s
+
+#22 [result internal] load metadata for docker.io/library/node:18-slim
+#22 ...
+
+#11 [vote internal] load metadata for docker.io/library/python:3.11-slim
+#11 DONE 1.5s
+
+#22 [result internal] load metadata for docker.io/library/node:18-slim
+#22 DONE 1.5s
+
+#23 [vote internal] load .dockerignore
+#23 transferring context: 2B done
+#23 DONE 0.1s
+
+#24 [vote base 1/5] FROM docker.io/library/python:3.11-slim@sha256:0ce77749ac83174a31d5e107ce0cfa6b28a2fd6b0615e029d9d84b39c48976ee
+#24 DONE 0.0s
+
+#25 [vote internal] load build context
+#25 DONE 0.0s
+
+#26 [result internal] load .dockerignore
+#26 transferring context: 54B done
+#26 DONE 0.1s
+
+#25 [vote internal] load build context
+#25 transferring context: 274B done
+#25 DONE 0.0s
+
+#27 [vote final 1/1] COPY . .
+#27 CACHED
+
+#28 [vote base 2/5] RUN apt-get update &&     apt-get install -y --no-install-recommends curl &&     rm -rf /var/lib/apt/lists/*
+#28 CACHED
+
+#29 [vote base 3/5] WORKDIR /usr/local/app
+#29 CACHED
+
+#30 [vote base 4/5] COPY requirements.txt ./requirements.txt
+#30 CACHED
+
+#31 [vote base 5/5] RUN pip install --no-cache-dir -r requirements.txt
+#31 CACHED
+
+#32 [result 1/7] FROM docker.io/library/node:18-slim@sha256:f9ab18e354e6855ae56ef2b290dd225c1e51a564f87584b9bd21dd651838830e
+#32 DONE 0.0s
+
+#33 [vote] exporting to image
+#33 exporting layers done
+#33 writing image sha256:05972fcfeb7dc3e8f8869ede90ea02b61a6dabda0e3077c8716b7f5b58791677 done
+#33 naming to docker.io/library/jobvotingapp-vote done
+#33 DONE 0.0s
+
+#34 [result internal] load build context
+#34 transferring context: 579B done
+#34 DONE 0.1s
+
+#35 [result 3/7] WORKDIR /usr/local/app
+#35 CACHED
+
+#36 [result 6/7] RUN npm ci &&  npm cache clean --force &&  mv /usr/local/app/node_modules /node_modules
+#36 CACHED
+
+#37 [result 2/7] RUN apt-get update &&     apt-get install -y --no-install-recommends curl tini &&     rm -rf /var/lib/apt/lists/*
+#37 CACHED
+
+#38 [result 4/7] RUN npm install -g nodemon
+#38 CACHED
+
+#39 [result 5/7] COPY package*.json ./
+#39 CACHED
+
+#40 [result 7/7] COPY . .
+#40 CACHED
+
+#41 [result] exporting to image
+#41 exporting layers done
+#41 writing image sha256:f42f0fe9723089af29e3846790822cf62f53b6ccdb67acd2ec3d4dc0697769f4 done
+#41 naming to docker.io/library/jobvotingapp-result 0.0s done
+#41 DONE 0.2s
+
+#42 [vote] resolving provenance for metadata file
+#42 DONE 0.0s
+
+#43 [result] resolving provenance for metadata file
+#43 DONE 0.0s
+ jobvotingapp-worker  Built
+ jobvotingapp-vote  Built
+ jobvotingapp-result  Built
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Lancer l'application)
+[Pipeline] sh
++ docker compose up -d
+time="2025-07-30T13:49:50Z" level=warning msg="a network with name voting-backend exists but was not created by compose.\nSet `external: true` to use an existing network"
+network voting-backend was found but has incorrect label com.docker.compose.network set to "" (expected: "backend-network")
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Vérification des services)
+Stage "Vérification des services" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Tests de connectivité)
+Stage "Tests de connectivité" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] sh
++ echo === État final de tous les conteneurs ===
+=== État final de tous les conteneurs ===
++ docker compose ps
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS
++ echo === Résumé des services ===
+=== Résumé des services ===
++ docker ps --format table {{.Names}}\t{{.Status}}\t{{.Ports}}
+NAMES      STATUS          PORTS
+jenkins2   Up 30 minutes   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp, 0.0.0.0:50000->50000/tcp, [::]:50000->50000/tcp
+[Pipeline] sh
++ echo  Pipeline échoué - Logs de débogage:
+ Pipeline échoué - Logs de débogage:
++ echo === Logs des services ===
+=== Logs des services ===
++ docker compose logs --tail=50
+voting-worker  | Connected to db
+voting-worker  | Connecting to redis
+voting-worker  | Found redis at 172.18.0.2
+voting-worker  | Processing vote for 'a' by '598182e9823a9ec'
+voting-worker  | Processing vote for 'b' by '598182e9823a9ec'
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-worker  | Waiting for db
+voting-result  | Tue, 29 Jul 2025 19:52:34 GMT body-parser deprecated undefined extended: provide extended option at server.js:67:17
+voting-result  | App running on port 80
+voting-result  | Connected to db
+voting-result  | Wed, 30 Jul 2025 00:31:29 GMT body-parser deprecated undefined extended: provide extended option at server.js:67:17
+voting-result  | App running on port 80
+voting-db      | 2025-07-29 19:59:28.227 UTC [158] FATAL:  role "root" does not exist
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-result  | Waiting for db
+voting-redis   | 1:C 29 Jul 2025 19:51:55.754 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+voting-app     | [2025-07-29 19:52:04 +0000] [1] [INFO] Starting gunicorn 23.0.0
+voting-app     | [2025-07-29 19:52:04 +0000] [1] [INFO] Listening at: http://0.0.0.0:80 (1)
+voting-app     | [2025-07-29 19:52:04 +0000] [1] [INFO] Using worker: sync
+voting-app     | [2025-07-29 19:52:04 +0000] [7] [INFO] Booting worker with pid: 7
+voting-app     | [2025-07-29 19:52:04 +0000] [8] [INFO] Booting worker with pid: 8
+voting-app     | [2025-07-29 19:52:04 +0000] [9] [INFO] Booting worker with pid: 9
+voting-app     | [2025-07-29 19:52:04 +0000] [10] [INFO] Booting worker with pid: 10
+voting-app     | 172.18.0.1 - - [29/Jul/2025:20:03:00 +0000] "GET / HTTP/1.1" 200 1285 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
+voting-app     | 172.18.0.1 - - [29/Jul/2025:20:03:02 +0000] "GET /static/stylesheets/style.css HTTP/1.1" 304 0 "http://localhost:5000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
+voting-app     | 172.18.0.1 - - [29/Jul/2025:20:03:02 +0000] "GET /favicon.ico HTTP/1.1" 404 207 "http://localhost:5000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
+voting-app     | [2025-07-29 20:03:38,161] INFO in app: Received vote for a
+voting-app     | [2025-07-29 20:03:38 +0000] [7] [INFO] Received vote for a
+voting-app     | 172.18.0.1 - - [29/Jul/2025:20:03:38 +0000] "POST / HTTP/1.1" 200 1688 "http://localhost:5000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
+voting-app     | 172.18.0.1 - - [29/Jul/2025:20:03:38 +0000] "GET /static/stylesheets/style.css HTTP/1.1" 304 0 "http://localhost:5000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
+voting-app     | [2025-07-29 20:03:45,750] INFO in app: Received vote for b
+voting-app     | [2025-07-29 20:03:45 +0000] [8] [INFO] Received vote for b
+voting-app     | 172.18.0.1 - - [29/Jul/2025:20:03:45 +0000] "POST / HTTP/1.1" 200 1688 "http://localhost:5000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
+voting-app     | 172.18.0.1 - - [29/Jul/2025:20:03:45 +0000] "GET /static/stylesheets/style.css HTTP/1.1" 304 0 "http://localhost:5000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
+voting-app     | [2025-07-29 20:15:47 +0000] [1] [INFO] Handling signal: term
+voting-app     | [2025-07-29 20:15:48 +0000] [7] [INFO] Worker exiting (pid: 7)
+voting-app     | [2025-07-29 20:15:48 +0000] [10] [INFO] Worker exiting (pid: 10)
+voting-app     | [2025-07-29 20:15:48 +0000] [9] [INFO] Worker exiting (pid: 9)
+voting-app     | [2025-07-29 20:15:48 +0000] [8] [INFO] Worker exiting (pid: 8)
+voting-app     | [2025-07-29 20:15:53 +0000] [1] [INFO] Shutting down: Master
+voting-app     | [2025-07-30 00:31:24 +0000] [1] [INFO] Starting gunicorn 23.0.0
+voting-app     | [2025-07-30 00:31:24 +0000] [1] [INFO] Listening at: http://0.0.0.0:80 (1)
+voting-app     | [2025-07-30 00:31:24 +0000] [1] [INFO] Using worker: sync
+voting-app     | [2025-07-30 00:31:25 +0000] [7] [INFO] Booting worker with pid: 7
+voting-app     | [2025-07-30 00:31:25 +0000] [8] [INFO] Booting worker with pid: 8
+voting-app     | [2025-07-30 00:31:25 +0000] [10] [INFO] Booting worker with pid: 10
+voting-app     | [2025-07-30 00:31:25 +0000] [9] [INFO] Booting worker with pid: 9
+voting-app     | [2025-07-30 00:34:09 +0000] [1] [INFO] Handling signal: term
+voting-app     | [2025-07-30 00:34:09 +0000] [7] [INFO] Worker exiting (pid: 7)
+voting-app     | [2025-07-30 00:34:09 +0000] [10] [INFO] Worker exiting (pid: 10)
+voting-app     | [2025-07-30 00:34:09 +0000] [9] [INFO] Worker exiting (pid: 9)
+voting-app     | [2025-07-30 00:34:09 +0000] [8] [INFO] Worker exiting (pid: 8)
+voting-db      | 2025-07-29 19:59:58.344 UTC [166] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:00:28.443 UTC [174] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:00:58.531 UTC [182] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:01:28.897 UTC [190] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:01:59.296 UTC [198] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:02:29.493 UTC [206] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:02:59.704 UTC [214] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:03:29.817 UTC [222] FATAL:  role "root" does not exist
+voting-app     | [2025-07-30 00:34:09 +0000] [1] [INFO] Shutting down: Master
+voting-db      | 2025-07-29 20:03:39.153 UTC [41] ERROR:  duplicate key value violates unique constraint "votes_id_key"
+voting-db      | 2025-07-29 20:03:39.153 UTC [41] DETAIL:  Key (id)=(598182e9823a9ec) already exists.
+voting-db      | 2025-07-29 20:03:39.153 UTC [41] STATEMENT:  INSERT INTO votes (id, vote) VALUES ($1, $2)
+voting-db      | 2025-07-29 20:03:45.868 UTC [41] ERROR:  duplicate key value violates unique constraint "votes_id_key"
+voting-db      | 2025-07-29 20:03:45.868 UTC [41] DETAIL:  Key (id)=(598182e9823a9ec) already exists.
+voting-db      | 2025-07-29 20:03:45.868 UTC [41] STATEMENT:  INSERT INTO votes (id, vote) VALUES ($1, $2)
+voting-db      | 2025-07-29 20:04:00.105 UTC [229] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:04:30.190 UTC [237] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:05:00.266 UTC [245] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:05:30.357 UTC [252] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:06:00.450 UTC [261] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:06:30.635 UTC [269] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:06:57.494 UTC [26] LOG:  checkpoint starting: time
+voting-db      | 2025-07-29 20:06:57.765 UTC [26] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.224 s, sync=0.006 s, total=0.273 s; sync files=2, longest=0.004 s, average=0.003 s; distance=1 kB, estimate=1 kB
+voting-db      | 2025-07-29 20:07:00.734 UTC [277] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:07:30.830 UTC [286] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:08:01.139 UTC [294] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:08:31.230 UTC [302] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:09:01.346 UTC [310] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:09:31.583 UTC [318] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:10:01.817 UTC [326] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:10:31.931 UTC [334] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:11:02.035 UTC [342] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:11:32.140 UTC [350] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:12:02.520 UTC [358] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:12:32.630 UTC [366] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:13:02.852 UTC [374] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:13:33.339 UTC [381] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:14:03.475 UTC [389] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:14:33.545 UTC [397] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:15:03.819 UTC [405] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:15:33.996 UTC [413] FATAL:  role "root" does not exist
+voting-db      | 2025-07-29 20:15:47.976 UTC [1] LOG:  received fast shutdown request
+voting-db      | 2025-07-29 20:15:47.987 UTC [1] LOG:  aborting any active transactions
+voting-db      | 2025-07-29 20:15:47.990 UTC [41] FATAL:  terminating connection due to administrator command
+voting-db      | 2025-07-29 20:15:47.994 UTC [42] FATAL:  terminating connection due to administrator command
+voting-db      | 2025-07-29 20:15:48.416 UTC [1] LOG:  background worker "logical replication launcher" (PID 31) exited with exit code 1
+voting-db      | 2025-07-29 20:15:48.425 UTC [26] LOG:  shutting down
+voting-db      | 2025-07-29 20:15:48.482 UTC [26] LOG:  checkpoint starting: shutdown immediate
+voting-db      | 2025-07-29 20:15:48.658 UTC [26] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.076 s, sync=0.001 s, total=0.233 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=1 kB
+voting-db      | 2025-07-29 20:15:48.766 UTC [1] LOG:  database system is shut down
+voting-redis   | 1:C 29 Jul 2025 19:51:55.770 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+voting-redis   | 1:C 29 Jul 2025 19:51:55.770 * Redis version=7.4.5, bits=64, commit=00000000, modified=0, pid=1, just started
+voting-redis   | 1:C 29 Jul 2025 19:51:55.770 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+voting-redis   | 1:M 29 Jul 2025 19:51:55.772 * monotonic clock: POSIX clock_gettime
+voting-redis   | 1:M 29 Jul 2025 19:51:55.807 * Running mode=standalone, port=6379.
+voting-redis   | 1:M 29 Jul 2025 19:51:55.820 * Server initialized
+voting-redis   | 1:M 29 Jul 2025 19:51:55.822 * Ready to accept connections tcp
+voting-redis   | 1:signal-handler (1753820147) Received SIGTERM scheduling shutdown...
+voting-redis   | 1:M 29 Jul 2025 20:15:47.802 * User requested shutdown...
+voting-redis   | 1:M 29 Jul 2025 20:15:47.803 * Saving the final RDB snapshot before exiting.
+voting-redis   | 1:M 29 Jul 2025 20:15:47.891 * DB saved on disk
+voting-redis   | 1:M 29 Jul 2025 20:15:47.904 # Redis is now ready to exit, bye bye...
++ echo === État des conteneurs ===
+=== État des conteneurs ===
++ docker compose ps
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE
+
